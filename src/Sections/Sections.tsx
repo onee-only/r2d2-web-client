@@ -13,7 +13,7 @@ interface Section {
 
 interface Example {
     input: Input;
-    expected: Expected | Map<string, Template>;
+    expected: Expected | any;
 }
 
 interface Input {
@@ -31,7 +31,7 @@ interface Expected {
 
 interface Template {
     headers: any;
-    bodySchema: string;
+    body_schema: string;
 }
 
 export default function Sections(data: { taskID: string }) {
@@ -73,7 +73,6 @@ export default function Sections(data: { taskID: string }) {
                         <div>예시 (HTTP 요청과 그에 따른 응답)</div>
                         <div>
                             {examples.map((example) => {
-                                console.log(example);
                                 const inputBody =
                                     example.input.body === undefined
                                         ? ""
@@ -94,10 +93,11 @@ export default function Sections(data: { taskID: string }) {
                                 }
 
                                 let response: JSX.Element;
-                                if (example.expected instanceof Map) {
-                                    const entries = Array.from(
-                                        example.expected.entries()
+                                if (!Object.hasOwn(example.expected, "status")) {
+                                    const m = new Map<string, Template>(
+                                        Object.entries(example.expected)
                                     );
+                                    const entries = Array.from(m.entries());
                                     response = (
                                         <>
                                             {entries.map(([key, value]) => {
@@ -113,11 +113,11 @@ export default function Sections(data: { taskID: string }) {
                                                 }
 
                                                 const responseSchema =
-                                                    value.bodySchema === undefined
+                                                    value.body_schema === undefined
                                                         ? ""
                                                         : JSON.stringify(
                                                               JSON.parse(
-                                                                  atob(value.bodySchema)
+                                                                  atob(value.body_schema)
                                                               ),
                                                               null,
                                                               4

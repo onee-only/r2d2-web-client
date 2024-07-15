@@ -115,7 +115,11 @@ export default function Submissions(data: { taskID: string }) {
                             </div>
                             <div>제출자</div>
                             <div>
-                                <img src={submission.user.profileURL} alt="hi" />
+                                <img
+                                    src={submission.user.profileURL}
+                                    alt="hi"
+                                    height={50}
+                                />
                                 <div>이름: {submission.user.username}</div>
                                 <div>역할: {submission.user.role}</div>
                             </div>
