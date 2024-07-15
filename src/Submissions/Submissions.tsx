@@ -27,7 +27,7 @@ interface Timeline {
     timestamp: string;
 }
 
-export default function Submissions(value: { taskID: string }) {
+export default function Submissions(data: { taskID: string }) {
     const [token] = useState(localStorage.getItem("token") || "");
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [timelines, setTimelines] = useState<Timeline[]>([]);
@@ -37,8 +37,8 @@ export default function Submissions(value: { taskID: string }) {
     const [commitHash, setCommitHash] = useState("");
 
     const onSubmitClick = async () => {
-        const data: SubmissionOutput = await axios.post(
-            `http://${SERVER_HOST}/tasks/${value.taskID}/submissions`,
+        const value: AxiosResponse<SubmissionOutput> = await axios.post(
+            `http://${SERVER_HOST}/tasks/${data.taskID}/submissions`,
             {
                 repository: repository,
                 commitHash: commitHash,
@@ -50,14 +50,14 @@ export default function Submissions(value: { taskID: string }) {
             }
         );
 
-        setCurID(data.id);
+        setCurID(value.data.id);
     };
 
     useEffect(() => {
         if (curID === "") {
             axios
                 .get<any, AxiosResponse<Submission[], any>>(
-                    `http://${SERVER_HOST}/tasks/${value.taskID}/submissions?offset=0`
+                    `http://${SERVER_HOST}/tasks/${data.taskID}/submissions?offset=0`
                 )
                 .then((data) => {
                     setSubmissions(data.data);
@@ -67,12 +67,12 @@ export default function Submissions(value: { taskID: string }) {
 
         axios
             .get<any, AxiosResponse<Timeline[], any>>(
-                `http://${SERVER_HOST}/tasks/${value.taskID}/submissions/${curID}/events`
+                `http://${SERVER_HOST}/tasks/${data.taskID}/submissions/${curID}/events`
             )
             .then((data) => {
                 setTimelines(data.data);
             });
-    }, [value.taskID, curID]);
+    }, [data.taskID, curID]);
 
     return (
         <>
@@ -81,19 +81,28 @@ export default function Submissions(value: { taskID: string }) {
 
             {curID === "" ? (
                 <>
-                    <input
-                        placeholder="소스코드 레포지터리 (예: onee-only/go-git)"
-                        value={repository}
-                        onChange={(e) => setRepository(e.target.value)}
-                    ></input>
-                    <input
-                        placeholder="커밋 해시"
-                        value={commitHash}
-                        onChange={(e) => setCommitHash(e.target.value)}
-                    ></input>
-                    <button onClick={onSubmitClick} disabled={token === ""}>
-                        제출하기
-                    </button>
+                    <div>
+                        <input
+                            style={{ width: "300px" }}
+                            placeholder="소스코드 레포지터리 (예: onee-only/go-git)"
+                            value={repository}
+                            onChange={(e) => setRepository(e.target.value)}
+                        />
+                    </div>
+
+                    <div>
+                        <input
+                            style={{ width: "300px" }}
+                            placeholder="커밋 해시"
+                            value={commitHash}
+                            onChange={(e) => setCommitHash(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <button onClick={onSubmitClick} disabled={token === ""}>
+                            제출하기
+                        </button>
+                    </div>
 
                     <br />
                     <div>제출자 목록</div>

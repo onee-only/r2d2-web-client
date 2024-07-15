@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
 import { SERVER_HOST } from "../common";
 
@@ -19,21 +19,28 @@ export default function Login() {
     const [code, setCode] = useState("");
 
     const getInfo = async () => {
-        const data: UserInfo = await axios.get(`http://${SERVER_HOST}/users/me`, {
-            headers: {
-                Authorization: "Bearer " + token,
-            },
-        });
+        const data: AxiosResponse<UserInfo> = await axios.get(
+            `http://${SERVER_HOST}/users/me`,
+            {
+                headers: {
+                    Authorization: "Bearer " + token,
+                },
+            }
+        );
 
-        setInfo(data);
+        setInfo(data.data);
     };
 
     const onCodeSubmit = async () => {
-        const data: Token = await axios.post(`http://${SERVER_HOST}/auth/oauth/github`, {
-            code: code,
-        });
+        const data: AxiosResponse<Token> = await axios.post(
+            `http://${SERVER_HOST}/auth/oauth/github`,
+            {
+                code: code,
+            }
+        );
 
-        setToken(data.token);
+        setToken(data.data.token);
+        localStorage.setItem("token", data.data.token);
     };
 
     const onLoginClick = () => {
@@ -44,7 +51,7 @@ export default function Login() {
         if (token !== "") {
             getInfo();
         }
-    });
+    }, [token]);
 
     return (
         <div>
@@ -64,7 +71,7 @@ export default function Login() {
                 </div>
             ) : (
                 <div>
-                    <img src={info?.profileURL} alt="hi" />
+                    <img src={info?.profileURL} alt="hi" height={50} />
                     <div>이름: {info?.username}</div>
                     <div>역할: {info?.role}</div>
                 </div>

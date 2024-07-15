@@ -66,8 +66,6 @@ export default function Tasks() {
                     <div>설명: {curTask?.description}</div>
                     <div>상태: {curTask?.stage}</div>
                     <br />
-                    <br />
-                    <br />
 
                     <Resources taskID={curID} />
                     <Sections taskID={curID} />

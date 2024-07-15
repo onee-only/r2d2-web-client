@@ -21,7 +21,7 @@ export default function Resources(data: { taskID: string }) {
             .then((data) => {
                 setResources(data.data);
             });
-    });
+    }, [data.taskID]);
 
     return (
         <>
@@ -31,11 +31,19 @@ export default function Resources(data: { taskID: string }) {
             {resources.map((resource) => (
                 <>
                     <br />
-                    <div>호스트: {resource.name}</div>
-                    <div>이미지: {resource.image}</div>
+                    {resource.isPrimary ? (
+                        <div>
+                            <b>사용자에게 제공되는 자원</b>
+                        </div>
+                    ) : (
+                        <>
+                            <div>호스트: {resource.name}</div>
+                            <div>이미지: {resource.image}</div>
+                        </>
+                    )}
                     <div>포트: {resource.port}</div>
                     <div>cpu 할당량 (개): {resource.cpu}</div>
-                    <div>메모리 할당량 (Byte): {resource.memory}</div>
+                    <div>메모리 할당량 (MB): {resource.memory / 1000 / 1000}</div>
                 </>
             ))}
         </>
